@@ -42,3 +42,21 @@ function content_taxonomy_migrate_content_migrate_instance_alter(&$instance_valu
     }
   }
 }
+
+function content_taxonomy_migrate_content_migrate_data_record_alter(&$record, $field) {
+  // fill the taxonomy_index
+  if ($field['type'] == 'taxonomy_term_reference') {
+    if (variable_get('taxonomy_maintain_index_table', TRUE) && $field['storage']['type'] == 'field_sql_storage' && $record['entity_type'] == 'node') {
+      $entity = node_load($record['entity_id']);
+      db_delete('taxonomy_index')->condition('nid', $entity->nid)->condition('tid', $record[$field['field_name'] . "_tid"])->execute();
+      $query = db_insert('taxonomy_index')->fields(array('nid', 'tid', 'sticky', 'created', ));
+      $query->values(array(
+        'nid' => $entity->nid,
+        'tid' => $record[$field['field_name'] . "_tid"],
+        'sticky' => $entity->sticky,
+        'created' => $entity->created,
+      ));
+      $query->execute();
+    }
+  }
+}
