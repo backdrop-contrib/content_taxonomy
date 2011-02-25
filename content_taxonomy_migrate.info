@@ -1,4 +1,3 @@
-; $Id$
 name = Content Taxonomy Migrate
 description = Migration from Content Taxonomy to Term Reference Fields
 
