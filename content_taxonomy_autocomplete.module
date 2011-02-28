@@ -1,0 +1,63 @@
+<?php
+// $Id: $
+
+/**
+ * Implements hook_field_widget_info_alter().
+ */
+function content_taxonomy_autocomplete_field_widget_info_alter(&$info) {
+  // Add a setting for validating new terms.
+  $info['taxonomy_autocomplete']['settings'] += array(
+    'content_taxonomy_autocomplete_new_terms' => 'allow',
+  );
+}
+
+/**
+ * Implements hook_form_ID_alter().
+ */
+function content_taxonomy_autocomplete_form_field_ui_field_edit_form_alter(&$form, &$form_state, $form_id) {
+  $instance = $form['#instance'];
+  if ($instance['widget']['type'] == 'taxonomy_autocomplete') {
+    // Add a setting form for validating new terms.
+    $options = array(
+      'allow' => t('Allow and insert new terms'),
+      'deny' => t('Deny any new terms'),
+    );
+    $form['instance']['settings']['content_taxonomy_autocomplete_new_terms'] = array(
+      '#type' => 'radios',
+      '#title' => t('Autocomplete settings'),
+      '#options' => $options,
+      '#default_value' => isset($instance['settings']['content_taxonomy_autocomplete_new_terms']) ? $instance['settings']['content_taxonomy_autocomplete_new_terms'] : 'allow',
+    );
+  }
+}
+
+/**
+ * Implements hook_field_attach_form().
+ */
+function content_taxonomy_autocomplete_field_attach_form($entity_type, $entity, &$form, &$form_state, $langcode) {
+  // Add validation function to taxonomy_autocompletes, if necessary.
+  $instances = field_info_instances($form['#entity_type'], $form['#bundle']);
+  foreach ($instances as $instance) {
+    if ($instance['widget']['type'] == 'taxonomy_autocomplete' 
+      && isset($form[$instance['field_name']]) 
+      && isset($instance['settings']['content_taxonomy_autocomplete_new_terms']) 
+      && $instance['settings']['content_taxonomy_autocomplete_new_terms'] == 'deny') {
+
+      $form[$instance['field_name']]['#element_validate'][] = 'content_taxonomy_autocomplete_validate_deny_new_terms';
+    }
+  }
+}
+
+/**
+ * Form element validate handler for taxonomy term autocomplete element, which denies any new terms
+ */
+function content_taxonomy_autocomplete_validate_deny_new_terms($element, &$form_state) {
+  // taxonomy_field_validate() is invoked before.
+  $field_name = $element[$element['#language']]['#field_name'];
+  foreach ($form_state['values'][$field_name][$element['#language']] as $delta => $value) {
+    if ($value['tid'] == 'autocreate') {
+      form_error($element, t('%name: new terms are not allowed.', array('%name' => $element[$element['#language']]['#title'])));
+    }
+  }
+}
+
