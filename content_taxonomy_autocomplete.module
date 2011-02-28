@@ -22,11 +22,11 @@ function content_taxonomy_autocomplete_form_field_ui_field_edit_form_alter(&$for
       'allow' => t('Allow and insert new terms'),
       'deny' => t('Deny any new terms'),
     );
-    $form['instance']['settings']['content_taxonomy_autocomplete_new_terms'] = array(
+    $form['instance']['widget']['settings']['content_taxonomy_autocomplete_new_terms'] = array(
       '#type' => 'radios',
       '#title' => t('Autocomplete settings'),
       '#options' => $options,
-      '#default_value' => isset($instance['settings']['content_taxonomy_autocomplete_new_terms']) ? $instance['settings']['content_taxonomy_autocomplete_new_terms'] : 'allow',
+      '#default_value' => isset($instance['widget']['settings']['content_taxonomy_autocomplete_new_terms']) ? $instance['widget']['settings']['content_taxonomy_autocomplete_new_terms'] : 'allow',
     );
   }
 }
@@ -40,8 +40,8 @@ function content_taxonomy_autocomplete_field_attach_form($entity_type, $entity, 
   foreach ($instances as $instance) {
     if ($instance['widget']['type'] == 'taxonomy_autocomplete' 
       && isset($form[$instance['field_name']]) 
-      && isset($instance['settings']['content_taxonomy_autocomplete_new_terms']) 
-      && $instance['settings']['content_taxonomy_autocomplete_new_terms'] == 'deny') {
+      && isset($instance['widget']['settings']['content_taxonomy_autocomplete_new_terms'])
+      && $instance['widget']['settings']['content_taxonomy_autocomplete_new_terms'] == 'deny') {
 
       $form[$instance['field_name']]['#element_validate'][] = 'content_taxonomy_autocomplete_validate_deny_new_terms';
     }
