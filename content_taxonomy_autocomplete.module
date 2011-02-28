@@ -6,9 +6,11 @@
  */
 function content_taxonomy_autocomplete_field_widget_info_alter(&$info) {
   // Add a setting for validating new terms.
-  $info['taxonomy_autocomplete']['settings'] += array(
+  $ct_settings = array(
     'content_taxonomy_autocomplete_new_terms' => 'allow',
   );
+  $info['taxonomy_autocomplete']['settings'] += $ct_settings;
+  $info['autocomplete_deluxe_taxonomy']['settings'] += $ct_settings;
 }
 
 /**
@@ -16,7 +18,7 @@ function content_taxonomy_autocomplete_field_widget_info_alter(&$info) {
  */
 function content_taxonomy_autocomplete_form_field_ui_field_edit_form_alter(&$form, &$form_state, $form_id) {
   $instance = $form['#instance'];
-  if ($instance['widget']['type'] == 'taxonomy_autocomplete') {
+  if ($instance['widget']['type'] == 'taxonomy_autocomplete' || $instance['widget']['type'] == 'autocomplete_deluxe_taxonomy') {
     // Add a setting form for validating new terms.
     $options = array(
       'allow' => t('Allow and insert new terms'),
@@ -38,7 +40,7 @@ function content_taxonomy_autocomplete_field_attach_form($entity_type, $entity, 
   // Add validation function to taxonomy_autocompletes, if necessary.
   $instances = field_info_instances($form['#entity_type'], $form['#bundle']);
   foreach ($instances as $instance) {
-    if ($instance['widget']['type'] == 'taxonomy_autocomplete' 
+    if (($instance['widget']['type'] == 'taxonomy_autocomplete' || $instance['widget']['type'] == 'autocomplete_deluxe_taxonomy') 
       && isset($form[$instance['field_name']]) 
       && isset($instance['widget']['settings']['content_taxonomy_autocomplete_new_terms'])
       && $instance['widget']['settings']['content_taxonomy_autocomplete_new_terms'] == 'deny') {
