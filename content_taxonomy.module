@@ -6,7 +6,13 @@
  */
 function content_taxonomy_form_field_ui_field_edit_form_alter(&$form, &$form_state, $form_id) {
   $field = $form['#field'];
-  if ($field['type'] == 'taxonomy_term_reference') {
+  $instance = $form['#instance'];
+
+  // Add parent selctor to term reference fields,
+  // except to the autocomplete widget, as it ignores the parent setting.
+  if ($field['type'] == 'taxonomy_term_reference'
+    && !($instance['widget']['type'] == 'taxonomy_autocomplete' || $instance['widget']['type'] == 'autocomplete_deluxe_taxonomy')) {
+
     // add parent form.
     foreach ($field['settings']['allowed_values'] as $delta => $tree) {
       $options[0] = '---';
