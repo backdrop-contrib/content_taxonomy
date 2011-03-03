@@ -25,7 +25,7 @@ function content_taxonomy_form_field_ui_field_edit_form_alter(&$form, &$form_sta
         '#type' => 'select',
         '#title' => t('Parent'),
         '#options' => $options,
-        '#default_value' => isset($tree['parent']) ? $tree['parent'] : 3,
+        '#default_value' => isset($tree['parent']) ? $tree['parent'] : 0,
       );
     } 
   }
