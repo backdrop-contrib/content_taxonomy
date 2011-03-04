@@ -9,7 +9,11 @@ function content_taxonomy_autocomplete_field_widget_info_alter(&$info) {
     'content_taxonomy_autocomplete_new_terms' => 'allow',
   );
   $info['taxonomy_autocomplete']['settings'] += $ct_settings;
-  $info['autocomplete_deluxe_taxonomy']['settings'] += $ct_settings;
+
+  // Add this to the autocomplete deluxe as well, if enabled.
+  if (isset($info['autocomplete_deluxe_taxonomy']['settings'])) {
+    $info['autocomplete_deluxe_taxonomy']['settings'] += $ct_settings;
+  }
 }
 
 /**
