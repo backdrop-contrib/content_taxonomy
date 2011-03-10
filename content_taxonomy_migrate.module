@@ -26,7 +26,7 @@ function content_taxonomy_migrate_content_migrate_instance_alter(&$instance_valu
     $instance_value['widget']['type'] = 'options_buttons';
     $instance_value['widget']['module'] = 'options';
   }
-  else if ($instance_value['widget_type'] == "content_taxonomy_select") {
+  else if ($instance_value['widget_type'] == "content_taxonomy_select" || $instance_value['widget_type'] == 'content_taxonomy_hs') {
     $instance_value['widget_type'] = 'options_select';
     $instance_value['widget']['type'] = 'options_select';
     $instance_value['widget']['module'] = 'options';
