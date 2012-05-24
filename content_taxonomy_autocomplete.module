@@ -149,3 +149,15 @@ function content_taxonomy_autocomplete_query_autocomplete_deluxe_taxonomy_autoco
     }
   }
 }
+
+/**
+ * Implements hook_search_api_processor_info().
+ */
+function content_taxonomy_autocomplete_search_api_processor_info() {
+  $callbacks['content_taxonomy_autocomplete_moderated_terms'] = array(
+    'name' => t('Content Taxonomy Autocomplete Moderated Terms Filter'),
+    'description' => t('Filters terms from autocompletes that belong to the moderated vocabulary.'),
+    'class' => 'ContentTaxonomyAutocompleteModeratedTermsSearchAPIProcessor',
+  );
+  return $callbacks;
+}

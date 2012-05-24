@@ -6,4 +6,6 @@ package = Fields
 
 dependencies[] = content_taxonomy
 
+files[] = includes/content_taxonomy_autocomplete_moderated_terms.inc
+
 
