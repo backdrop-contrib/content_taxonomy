@@ -24,7 +24,7 @@ class ContentTaxonomyAutocompleteModeratedTermsSearchAPIProcessor extends Search
     foreach ($items as &$item) {
       foreach ($fields as $search_api_property_name => $field) {
         if (isset($item[$search_api_property_name])) {
-          $this->processField($item[$search_api_property_name]['value'], $item[$search_api_property_name]['type'], $field);
+          $this->processTaxonomyField($item[$search_api_property_name]['value'], $item[$search_api_property_name]['type'], $field);
         }
       }
     }
@@ -36,7 +36,7 @@ class ContentTaxonomyAutocompleteModeratedTermsSearchAPIProcessor extends Search
    * As such a field can be nested, recursions are used until we reach the top
    * level.
    */
-  protected function processField(&$value, &$type, $field) {
+  protected function processTaxonomyField(&$value, &$type, $field) {
     if (!isset($value) || $value === '') {
       return;
     }
@@ -44,7 +44,7 @@ class ContentTaxonomyAutocompleteModeratedTermsSearchAPIProcessor extends Search
       $inner_type = $t1 = substr($type, 5, -1);
       foreach ($value as &$v) {
         $t1 = $inner_type;
-        $this->processField($v, $t1, $field);
+        $this->processTaxonomyField($v, $t1, $field);
       }
       return;
     }
