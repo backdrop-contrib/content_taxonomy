@@ -69,7 +69,7 @@ function content_taxonomy_allowed_values($field) {
       $max_depth = (isset($tree['depth']) && !empty($tree['depth'])) ? $tree['depth'] : NULL;
       if ($terms = taxonomy_get_tree($vocabulary->vid, $tree['parent'], $max_depth)) {
         foreach ($terms as $term) {
-          $options[$term->tid] = str_repeat('-', $term->depth) . $term->name;
+          $options[$term->tid] = str_repeat('- ', $term->depth) . $term->name;
         }
       }
     }
