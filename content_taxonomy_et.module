@@ -348,6 +348,7 @@ function content_taxonomy_et_autocomplete_deluxe($field_name, $tags_typed = '', 
   else {
     $query
       ->fields('t', array('tid', 'name'))
+      ->fields('fd', array('name_field_value'))
       ->condition('t.vid', $vids);
 
     if (isset($limit) && $limit > 0) {
