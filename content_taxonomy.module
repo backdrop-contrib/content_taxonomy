@@ -7,12 +7,14 @@ function content_taxonomy_form_field_ui_field_edit_form_alter(&$form, &$form_sta
   $field = $form['#field'];
   $instance = $form['#instance'];
 
-  // Add parent selector to term reference fields,
-  // except to the autocomplete widget, as it ignores the parent setting.
+  // Add parent selector to term reference fields, except to the autocomplete
+  // widget, as it ignores the parent setting.
   if ($field['type'] == 'taxonomy_term_reference'
-    && !($instance['widget']['type'] == 'taxonomy_autocomplete' || $instance['widget']['type'] == 'autocomplete_deluxe_taxonomy')) {
-
-    // add parent form.
+      && $instance['widget']['type'] != 'taxonomy_autocomplete'
+      && $instance['widget']['type'] != 'autocomplete_deluxe_taxonomy'
+      && $instance['widget']['type'] != 'entityreference_autocomplete'
+      && $instance['widget']['type'] != 'entityreference_autocomplete_tags') {
+    // Add parent form.
     foreach ($field['settings']['allowed_values'] as $delta => $tree) {
       $options[0] = '---';
       // todo this might break with huge vocs
