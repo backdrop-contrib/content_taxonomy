@@ -132,7 +132,7 @@ function content_taxonomy_autocomplete_validate_deny_new_terms($element, &$form_
   }
   foreach ($values as $delta => $value) {
     if (isset($value['tid']) && $value['tid'] == 'autocreate') {
-      form_error($element, t('%name: new terms are not allowed. Please choose from the given list.', array('%name' => $element['#title'])));
+      form_error($element, t('%name: new terms are not allowed. Please choose from the suggested options.', array('%name' => $element['#title'])));
     }
   }
 }
