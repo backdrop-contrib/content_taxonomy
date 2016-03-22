@@ -26,6 +26,11 @@ function content_taxonomy_migrate_content_migrate_field_alter(&$field_value, $in
  * Implements hook_content_migrate_instance_alter().
  */
 function content_taxonomy_migrate_content_migrate_instance_alter(&$instance_value, $field_value) {
+  // Only work on content_taxonomy fields.
+  if ($field_value['type'] != 'content_taxonomy') {
+    return;
+  }
+
   // Fix the widget.
   if ($instance_value['widget_type'] == "content_taxonomy_autocomplete") {
     $instance_value['widget_type'] = 'taxonomy_autocomplete';
