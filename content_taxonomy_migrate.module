@@ -1,11 +1,18 @@
 <?php
+/**
+ * @file
+ *
+ */
 
+/**
+ * Implements hook_content_migrate_field_alter().
+ */
 function content_taxonomy_migrate_content_migrate_field_alter(&$field_value, $instance_value) {
   if ($field_value['type'] == 'content_taxonomy') {
     $field_value['type'] = 'taxonomy_term_reference';
     $field_value['module'] = 'taxonomy';
     
-    // transform field settings
+    // Transform field settings.
     $old_settings = $field_value['settings'];
     $vocabulary = taxonomy_vocabulary_load($old_settings['vid']);
     $field_value['settings'] = array();
@@ -14,8 +21,12 @@ function content_taxonomy_migrate_content_migrate_field_alter(&$field_value, $in
     $field_value['settings']['allowed_values'][0]['parent'] = $old_settings['parent'];
   }
 }
-  
+
+/**
+ * Implements hook_content_migrate_instance_alter().
+ */
 function content_taxonomy_migrate_content_migrate_instance_alter(&$instance_value, $field_value) {
+  // Fix the widget.
   if ($instance_value['widget_type'] == "content_taxonomy_autocomplete") {
     $instance_value['widget_type'] = 'taxonomy_autocomplete';
     $instance_value['widget']['type'] = 'taxonomy_autocomplete';
@@ -32,7 +43,7 @@ function content_taxonomy_migrate_content_migrate_instance_alter(&$instance_valu
     $instance_value['widget']['module'] = 'options';
   }
   
-  // fix formatter
+  // Fix the formatter.
   foreach ($instance_value['display'] as $context => $settings) {
     if ($instance_value['display'][$context]['type'] == 'default') {
       $instance_value['display'][$context]['type'] = 'taxonomy_term_reference_plain';
@@ -43,9 +54,17 @@ function content_taxonomy_migrate_content_migrate_instance_alter(&$instance_valu
   }
 }
 
+/**
+ * Implements hook_content_migrate_data_record_alter().
+ */
 function content_taxonomy_migrate_content_migrate_data_record_alter(&$record, $field) {
-  // fill the taxonomy_index
   if ($field['type'] == 'taxonomy_term_reference') {
+    // Copy field_FIELD_NAME_value (D6) to field_FIELD_NAME_tid (D7).
+    if (isset($record[$field['field_name'] . '_value']) && !isset($record[$field['field_name'] . '_tid'])) {
+      $record[$field['field_name'] . '_tid'] = $record[$field['field_name'] . '_value'];
+    }
+
+    // Fill the taxonomy_index.
     if (variable_get('taxonomy_maintain_index_table', TRUE) && $field['storage']['type'] == 'field_sql_storage' && $record['entity_type'] == 'node') {
       if (isset($record[$field['field_name'] . "_tid"]) && $record[$field['field_name'] . "_tid"]) {
         $entity = node_load($record['entity_id']);
