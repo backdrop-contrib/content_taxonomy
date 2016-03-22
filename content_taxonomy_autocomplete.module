@@ -134,8 +134,10 @@ function content_taxonomy_autocomplete_field_attach_form($entity_type, $entity, 
  */
 function content_taxonomy_autocomplete_validate_deny_new_terms($element, &$form_state, $form) {
   $values = $form_state['values'];
-  foreach ($element['#array_parents'] as $parent) {
-    $values = $values[$parent];
+  if (!empty($element['#array_parents'])) {
+    foreach ($element['#array_parents'] as $parent) {
+      $values = $values[$parent];
+    }
   }
   foreach ($values as $delta => $value) {
     if (isset($value['tid']) && $value['tid'] == 'autocreate') {
