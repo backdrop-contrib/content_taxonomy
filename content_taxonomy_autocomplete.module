@@ -10,6 +10,11 @@ function content_taxonomy_autocomplete_field_widget_info_alter(&$info) {
   );
   $info['taxonomy_autocomplete']['settings'] += $ct_settings;
 
+  // Add this to the Active Tags as well, if enabled.
+  if (isset($info['active_tags']['settings'])) {
+    $info['active_tags']['settings'] += $ct_settings;
+  }
+
   // Add this to the autocomplete deluxe as well, if enabled.
   if (isset($info['autocomplete_deluxe_taxonomy']['settings'])) {
     $info['autocomplete_deluxe_taxonomy']['settings'] += $ct_settings;
@@ -33,6 +38,7 @@ function content_taxonomy_autocomplete_form_field_ui_field_edit_form_alter(&$for
   $field = $form['#field'];
   $instance = $form['#instance'];
   if ($instance['widget']['type'] == 'taxonomy_autocomplete'
+      || $instance['widget']['type'] == 'active_tags_taxonomy_autocomplete'
       || $instance['widget']['type'] == 'autocomplete_deluxe_taxonomy'
       || $instance['widget']['type'] == 'entityreference_autocomplete'
       || $instance['widget']['type'] == 'entityreference_autocomplete_tags') {
@@ -53,6 +59,7 @@ function content_taxonomy_autocomplete_form_field_ui_field_edit_form_alter(&$for
 
   // Show form for second vocabulary.
   if (($instance['widget']['type'] == 'taxonomy_autocomplete'
+      || $instance['widget']['type'] == 'active_tags_taxonomy_autocomplete'
       || $instance['widget']['type'] == 'autocomplete_deluxe_taxonomy'
       || $instance['widget']['type'] == 'entityreference_autocomplete'
       || $instance['widget']['type'] == 'entityreference_autocomplete_tags')
