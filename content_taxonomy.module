@@ -1,4 +1,7 @@
 <?php
+/**
+ * @file
+ */
 
 /**
  * Implements hook_form_ID_alter().
@@ -119,7 +122,7 @@ function content_taxonomy_get_terms($field, $vocabulary, $parent, $max_depth) {
   $terms = array();
 
   $tree_callback = 'taxonomy_get_tree';
-  drupal_alter('content_taxonomy_tree_callback', $tree_callback, $field, $vocabulary);
+  backdrop_alter('content_taxonomy_tree_callback', $tree_callback, $field, $vocabulary);
   if (function_exists($tree_callback)) {
     $terms = $tree_callback($vocabulary->vid, $parent, $max_depth, FALSE);
   }
