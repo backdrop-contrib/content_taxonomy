@@ -35,13 +35,10 @@ function content_taxonomy_autocomplete_field_widget_info_alter(&$info) {
  * Implements hook_form_ID_alter().
  */
 function content_taxonomy_autocomplete_form_field_ui_field_edit_form_alter(&$form, &$form_state, $form_id) {
+  $supported_types = _content_taxonomy_autocomplete_supported_types();
   $field = $form['#field'];
   $instance = $form['#instance'];
-  if ($instance['widget']['type'] == 'taxonomy_autocomplete'
-      || $instance['widget']['type'] == 'active_tags_taxonomy_autocomplete'
-      || $instance['widget']['type'] == 'autocomplete_deluxe_taxonomy'
-      || $instance['widget']['type'] == 'entityreference_autocomplete'
-      || $instance['widget']['type'] == 'entityreference_autocomplete_tags') {
+  if (in_array($instance['widget']['type'], $supported_types)) {
     // Add a setting form for validating new terms.
     $options = array(
       'allow' => t('Allow and insert new terms'),
@@ -58,12 +55,7 @@ function content_taxonomy_autocomplete_form_field_ui_field_edit_form_alter(&$for
   }
 
   // Show form for second vocabulary.
-  if (($instance['widget']['type'] == 'taxonomy_autocomplete'
-      || $instance['widget']['type'] == 'active_tags_taxonomy_autocomplete'
-      || $instance['widget']['type'] == 'autocomplete_deluxe_taxonomy'
-      || $instance['widget']['type'] == 'entityreference_autocomplete'
-      || $instance['widget']['type'] == 'entityreference_autocomplete_tags')
-    && isset($form[$instance['field_name']])
+  if (in_array($instance['widget']['type'], $supported_types)
     && isset($instance['widget']['settings']['content_taxonomy_autocomplete_new_terms'])) {
 
     // Initialize settings, if not set.
@@ -108,11 +100,9 @@ function content_taxonomy_autocomplete_form_field_ui_field_edit_form_alter(&$for
 function content_taxonomy_autocomplete_field_attach_form($entity_type, $entity, &$form, &$form_state, $langcode) {
   // Add validation function to taxonomy_autocompletes, if necessary.
   $instances = field_info_instances($form['#entity_type'], $form['#bundle']);
+  $supported_types = _content_taxonomy_autocomplete_supported_types();
   foreach ($instances as $instance) {
-    if (($instance['widget']['type'] == 'taxonomy_autocomplete'
-        || $instance['widget']['type'] == 'autocomplete_deluxe_taxonomy'
-        || $instance['widget']['type'] == 'entityreference_autocomplete'
-        || $instance['widget']['type'] == 'entityreference_autocomplete_tags')
+    if (in_array($instance['widget']['type'], $supported_types)
       && isset($form[$instance['field_name']])
       && isset($instance['widget']['settings']['content_taxonomy_autocomplete_new_terms'])) {
 
@@ -191,4 +181,24 @@ function content_taxonomy_autocomplete_search_api_processor_info() {
     'class' => 'ContentTaxonomyAutocompleteModeratedTermsSearchAPIProcessor',
   );
   return $callbacks;
+}
+
+/**
+ * Implements hook_autoload_info().
+ */
+function content_taxonomy_autocomplete_autoload_info() {
+  return array('ContentTaxonomyAutocompleteModeratedTermsSearchAPIProcessor' => 'includes/content_taxonomy_autocomplete_moderated_terms.inc');
+}
+
+/**
+ * Returns widget types this modules supports.
+ */
+function _content_taxonomy_autocomplete_supported_types() {
+  return array(
+    'taxonomy_autocomplete',
+    'active_tags_taxonomy_autocomplete',
+    'autocomplete_deluxe_taxonomy',
+    'entityreference_autocomplete',
+    'entityreference_autocomplete_tags',
+  );
 }
