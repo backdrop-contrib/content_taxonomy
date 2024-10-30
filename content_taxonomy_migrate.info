@@ -1,8 +1,0 @@
-name = Content Taxonomy Migrate
-description = Migration from Content Taxonomy to Term Reference fields.
-
-core = 7.x
-package = Fields
-
-dependencies[] = taxonomy
-dependencies[] = content_migrate

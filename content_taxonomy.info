@@ -1,9 +1,6 @@
 name = Content Taxonomy
 description = Extends the Taxonomy Reference Fields
-
-core = 7.x
+backdrop = 1.x
 package = Fields
 
 dependencies[] = taxonomy
-
-

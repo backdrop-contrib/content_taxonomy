@@ -1,8 +1,0 @@
-name = Content Taxonomy Entity Translations
-description = Adds support for terms that are translated via the Entity Translation and Title module.
-core = 7.x
-package = Fields
-
-dependencies[] = content_taxonomy
-dependencies[] = entity_translation
-dependencies[] = title
