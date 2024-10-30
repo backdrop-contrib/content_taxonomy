@@ -1,0 +1,9 @@
+name = Content Taxonomy Migrate
+description = Migration from Content Taxonomy to Term Reference fields.
+backdrop = 1.x
+package = Fields
+hidden = TRUE
+
+dependencies[] = taxonomy
+; Port postponed because of this dependency
+dependencies[] = content_migrate
