@@ -1,3 +1,4 @@
+type = module
 name = Content Taxonomy Autocomplete
 description = Extends the Taxonomy Autocomplete Widget
 backdrop = 1.x
