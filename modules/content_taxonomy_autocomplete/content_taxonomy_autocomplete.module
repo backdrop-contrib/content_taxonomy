@@ -1,4 +1,7 @@
 <?php
+/**
+ * @file
+ */
 
 /**
  * Implements hook_field_widget_info_alter().
@@ -95,7 +98,7 @@ function content_taxonomy_autocomplete_form_field_ui_field_edit_form_alter(&$for
       '#type' => 'value',
       '#value' => $field['settings']['allowed_values'][1]['parent'],
     );
-    if($instance['widget']['type'] == 'autocomplete_deluxe_taxonomy') {
+    if ($instance['widget']['type'] == 'autocomplete_deluxe_taxonomy') {
       // todo: should this setting be added field_info_alter?
       $form['field']['settings']['allowed_values'][1]['content_taxonomy_ignore_in_suggestions'] = array(
         '#type' => 'checkbox',
@@ -154,7 +157,9 @@ function content_taxonomy_autocomplete_field_attach_form($entity_type, $entity, 
 }
 
 /**
- * Form element validate handler for taxonomy term autocomplete element, which denies any new terms.
+ * Form element validate handler.
+ *
+ * For taxonomy term autocomplete element, which denies any new terms.
  */
 function content_taxonomy_autocomplete_validate_deny_new_terms($element, &$form_state, $form) {
   $values = $form_state['values'];
@@ -171,7 +176,10 @@ function content_taxonomy_autocomplete_validate_deny_new_terms($element, &$form_
 }
 
 /**
- * Form element validate handler for taxonomy term autocomplete element, which inserts new terms into a separate voc.
+ * Form element validate handler.
+ *
+ * For taxonomy term autocomplete element, which inserts new terms into a
+ * separate vocabulary.
  */
 function content_taxonomy_autocomplete_validate_moderate_new_terms($element, &$form_state) {
   // taxonomy_field_validate() is invoked before.

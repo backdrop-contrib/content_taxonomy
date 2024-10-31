@@ -63,12 +63,14 @@ class ContentTaxonomyAutocompleteModeratedTermsSearchAPIProcessor extends Search
   /**
    * Returns TRUE if the given term id is from moderated vocabulary.
    *
-   * @param $value
-   *  The term id.
-   * @param $field
-   *  The according field API field.
+   * @param int|string $value
+   *   The term id.
+   * @param array $field
+   *   The according field API field.
+   *
+   * @return bool
    */
-  private function fieldValueIsModerated($value, $field) {
+  private function fieldValueIsModerated($value, array $field) {
     $allowed_voc = $field['settings']['allowed_values'][0]['vocabulary'];
     $term = taxonomy_term_load($value);
     if ($term && $term->vocabulary == $allowed_voc) {

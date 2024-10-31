@@ -1,12 +1,10 @@
 <?php
-
 /**
  * @file
  * This file contains no working PHP code; it exists to provide additional
  * documentation for doxygen as well as to document hooks in the standard
  * Drupal manner.
  */
-
 
 /**
  * @addtogroup hooks
@@ -22,11 +20,11 @@
  * For example this hook can be used to exchange the callback with a language
  * specific tree function.
  *
- * @param $tree_callback
+ * @param string $tree_callback
  *   The current callback that can be overridden.
- * @param $field
+ * @param array $field
  *   The term reference field info array.
- * @param $vocabulary
+ * @param TaxonomyVocabulary $vocabulary
  *   The vocabulary object for which the term list should be retrieved. One
  *   field can have multiple vocabularies attached, which leads to multiple
  *   invocations of this function.
