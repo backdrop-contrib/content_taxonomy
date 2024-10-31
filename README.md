@@ -1,6 +1,14 @@
 # Content Taxonomy
 
-TBD...
+Provides extensions to Backdrop's core Taxonomy Term Reference Fields.
+
+Following extensions are available:
+
+- Parent term selector in the field settings (for options lists)
+- Options for new terms in autocomplete (Autocomplete Deluxe widget supported as well):
+- Allow and insert new terms (default behaviour)
+- Allow and insert new terms into a separate vocabulary (moderate)
+- Deny any new terms
 
 ## Installation
 
