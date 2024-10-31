@@ -22,7 +22,7 @@ function content_taxonomy_form_field_ui_field_edit_form_alter(&$form, &$form_sta
     // Add parent form.
     foreach ($field['settings']['allowed_values'] as $delta => $tree) {
       $options[0] = '---';
-      // todo this might break with huge vocs
+      // @todo this might break with huge vocs.
       $voc = taxonomy_vocabulary_load($tree['vocabulary']);
       foreach (taxonomy_get_tree($voc->machine_name) as $term) {
         $options[$term->tid] = str_repeat('- ', $term->depth) . $term->name;
@@ -74,12 +74,12 @@ function content_taxonomy_field_info_alter(&$info) {
  * Returns the set of valid terms for a taxonomy field.
  * Extends taxonomy_allowed_values() with the tree depth option.
  *
- * @param $field
+ * @param array $field
  *   The field definition.
- * @return
+ * @return array
  *   The array of valid terms for this field, keyed by term id.
  */
-function content_taxonomy_allowed_values($field) {
+function content_taxonomy_allowed_values(array $field) {
   $options = array();
   foreach ($field['settings']['allowed_values'] as $tree) {
     if ($vocabulary = taxonomy_vocabulary_load($tree['vocabulary'])) {
@@ -108,20 +108,20 @@ function content_taxonomy_allowed_values($field) {
  * Although we could change the options list callback via the field definitions,
  * it is easier to do this via the alteration hook provided by this function.
  *
- * @param $field
+ * @param array $field
  *   The term reference field info array.
- * @param $vocabulary
+ * @param TaxonomyVocabulary $vocabulary
  *   The vocabulary object for which the term list should be retrieved. One
  *   field can have multiple vocabularies attached, which leads to multiple
  *   invocations of this function.
- * @param $parent
+ * @param int $parent
  *   The parent term id. Use 0 for the root level.
- * @param $max_depth
+ * @param int $max_depth
  *   The maximum depth. Use NULL for non limitation.
  *
  * @return array
  */
-function content_taxonomy_get_terms($field, $vocabulary, $parent, $max_depth) {
+function content_taxonomy_get_terms(array $field, TaxonomyVocabulary $vocabulary, $parent, $max_depth) {
   $terms = array();
 
   $tree_callback = 'taxonomy_get_tree';
