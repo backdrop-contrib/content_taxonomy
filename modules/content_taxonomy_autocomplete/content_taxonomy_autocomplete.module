@@ -135,7 +135,6 @@ function content_taxonomy_autocomplete_field_attach_form($entity_type, $entity, 
   // Add validation function to taxonomy_autocompletes, if necessary.
   $instances = field_info_instances($form['#entity_type'], $form['#bundle']);
   $supported_types = _content_taxonomy_autocomplete_supported_types();
-  // @todo below code can not work.
   foreach ($instances as $instance) {
     if (in_array($instance['widget']['type'], $supported_types)
       && isset($form[$instance['field_name']])
