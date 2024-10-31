@@ -27,9 +27,8 @@ Bugs and Feature requests should be reported in the
 
 ## Credits
 
-This module is based on the Content Taxonomy module for Drupal
-
-... TBD
+This module is based on the Content Taxonomy module for Drupal, created and
+maintained by [mh86](https://www.drupal.org/u/mh86).
 
 ## License
 
