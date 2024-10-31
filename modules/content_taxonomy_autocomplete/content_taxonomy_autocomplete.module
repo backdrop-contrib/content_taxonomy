@@ -38,30 +38,34 @@ function content_taxonomy_autocomplete_form_field_ui_field_edit_form_alter(&$for
   $supported_types = _content_taxonomy_autocomplete_supported_types();
   $field = $form['#field'];
   $instance = $form['#instance'];
-  if (in_array($instance['widget']['type'], $supported_types)) {
-    // Add a setting form for validating new terms.
-    $options = array(
-      'allow' => t('Allow and insert new terms'),
-      'moderate' => t('Allow new terms and insert them into a separate vocabulary'),
-      'deny' => t('Deny any new terms'),
-    );
-    $form['instance']['widget']['settings']['content_taxonomy_autocomplete_new_terms'] = array(
-      '#type' => 'radios',
-      '#title' => t('Autocomplete settings'),
-      '#options' => $options,
-      '#default_value' => isset($instance['widget']['settings']['content_taxonomy_autocomplete_new_terms']) ? $instance['widget']['settings']['content_taxonomy_autocomplete_new_terms'] : 'allow',
-      '#description' => t('If option 2 is selected, re-save this settings form and afterwards select a second vocabulary for new terms in the field settings. In case the Autocomplete Deluxe widget is used, new terms can be hidden from the suggestion list.'),
-    );
+  if (!in_array($instance['widget']['type'], $supported_types)) {
+    return;
   }
 
+  // Add a setting form for validating new terms.
+  $options = array(
+    'allow' => t('Allow and insert new terms'),
+    'moderate' => t('Allow new terms and insert them into a separate vocabulary'),
+    'deny' => t('Deny any new terms'),
+  );
+  $form['instance']['widget']['settings']['content_taxonomy_autocomplete_new_terms'] = array(
+    '#type' => 'radios',
+    '#title' => t('Autocomplete settings'),
+    '#options' => $options,
+    '#default_value' => isset($instance['widget']['settings']['content_taxonomy_autocomplete_new_terms']) ? $instance['widget']['settings']['content_taxonomy_autocomplete_new_terms'] : 'allow',
+    '#description' => t('If option 2 is selected, select a second vocabulary for new terms in the global settings below. In case the Autocomplete Deluxe widget is used, new terms can be hidden from the suggestion list.'),
+  );
+
   // Show form for second vocabulary.
-  if (in_array($instance['widget']['type'], $supported_types)
-    && isset($instance['widget']['settings']['content_taxonomy_autocomplete_new_terms'])) {
+  $widget_settings = $instance['widget']['settings'];
+  $field_allowed_values = $field['settings']['allowed_values'];
+  // @todo isn't this always set?
+  if (isset($widget_settings['content_taxonomy_autocomplete_new_terms'])) {
 
     // Initialize settings, if not set.
     if (!isset($field['settings']['allowed_values'][1])) {
       $field['settings']['allowed_values'][1] = array(
-        'vocabulary' => $field['settings']['allowed_values'][0]['vocabulary'],
+        'vocabulary' => $field_allowed_values[0]['vocabulary'],
         'parent' => 0,
       );
     }
@@ -71,13 +75,21 @@ function content_taxonomy_autocomplete_form_field_ui_field_edit_form_alter(&$for
     foreach ($vocabularies as $vocabulary) {
       $options[$vocabulary->machine_name] = $vocabulary->name;
     }
+    $selector = ':input[name="instance[widget][settings][content_taxonomy_autocomplete_new_terms]"]';
     $form['field']['settings']['allowed_values'][1]['vocabulary'] = array(
       '#type' => 'select',
       '#title' => t('Vocabulary for new terms'),
-      '#default_value' => isset($field['settings']['allowed_values'][1]['vocabulary']) ? $field['settings']['allowed_values'][1]['vocabulary'] : '',
+      '#default_value' => isset($field_allowed_values[1]['vocabulary']) ? $field_allowed_values[1]['vocabulary'] : '',
       '#options' => $options,
       '#description' => t('New terms form autocompletes will be inserted in this vocabulary.'),
-      //'#disabled' => $has_data, //todo
+      '#states' => array(
+        'visible' => array(
+          $selector => array('value' => 'moderate'),
+        ),
+        'required' => array(
+          $selector => array('value' => 'moderate'),
+        ),
+      ),
     );
     $form['field']['settings']['allowed_values'][1]['parent'] = array(
       '#type' => 'value',
@@ -92,6 +104,28 @@ function content_taxonomy_autocomplete_form_field_ui_field_edit_form_alter(&$for
       );
     }
   }
+  $form['#validate'][] = '_content_taxonomy_autocomplete_form_field_ui_field_edit_form_validate';
+}
+
+/**
+ * Additional validation callback.
+ */
+function _content_taxonomy_autocomplete_form_field_ui_field_edit_form_validate(array $form, array &$form_state) {
+  $values = $form_state['values'];
+  if ($values['instance']['widget']['settings']['content_taxonomy_autocomplete_new_terms'] == 'moderate') {
+    $vocab_values = $form_state['values']['field']['settings']['allowed_values'];
+    if ($vocab_values[0]['vocabulary'] == $vocab_values[1]['vocabulary']) {
+      form_set_error('field][settings][allowed_values][1][vocabulary', t('The separate vocabulary can not be the same as the default one.'));
+    }
+    elseif ($vocab_values[1]['vocabulary'] == '') {
+      form_set_error('field][settings][allowed_values][1][vocabulary', t('The value for separate vocabulary can not be empty.'));
+    }
+  }
+  else {
+    // The logic of the form is a bit odd, the second value will always exist,
+    // as soon as this form has been saved once with this module enabled.
+    unset($form_state['values']['field']['settings']['allowed_values'][1]);
+  }
 }
 
 /**
@@ -101,6 +135,7 @@ function content_taxonomy_autocomplete_field_attach_form($entity_type, $entity, 
   // Add validation function to taxonomy_autocompletes, if necessary.
   $instances = field_info_instances($form['#entity_type'], $form['#bundle']);
   $supported_types = _content_taxonomy_autocomplete_supported_types();
+  // @todo below code can not work.
   foreach ($instances as $instance) {
     if (in_array($instance['widget']['type'], $supported_types)
       && isset($form[$instance['field_name']])
@@ -148,11 +183,10 @@ function content_taxonomy_autocomplete_validate_moderate_new_terms($element, &$f
     $values =& $values[$parent];
   }
   if (isset($field['settings']['allowed_values'][1])) {
-    if ($voc2 = taxonomy_vocabulary_machine_name_load($field['settings']['allowed_values'][1]['vocabulary'])) {
+    if ($voc2 = taxonomy_vocabulary_load($field['settings']['allowed_values'][1]['vocabulary'])) {
       foreach ($values as $delta => $value) {
         if ($value['tid'] == 'autocreate') {
-          $values[$delta]['vid'] = $voc2->vid;
-          $values[$delta]['vocabulary_machine_name'] = $voc2->machine_name;
+          $values[$delta]['vocabulary'] = $voc2->machine_name;
         }
       }
     }
@@ -165,8 +199,8 @@ function content_taxonomy_autocomplete_validate_moderate_new_terms($element, &$f
 function content_taxonomy_autocomplete_query_autocomplete_deluxe_taxonomy_autocomplete_alter(QueryAlterableInterface $query) {
   $field = field_info_field($query->getMetaData('field_name'));
   if (isset($field['settings']['allowed_values'][1]) && isset($field['settings']['allowed_values'][1]['content_taxonomy_ignore_in_suggestions']) && $field['settings']['allowed_values'][1]['content_taxonomy_ignore_in_suggestions']) {
-    if ($voc1 = taxonomy_vocabulary_machine_name_load($field['settings']['allowed_values'][0]['vocabulary'])) {
-      $query->condition('t.vid', $voc1->vid);
+    if ($voc1 = taxonomy_vocabulary_load($field['settings']['allowed_values'][0]['vocabulary'])) {
+      $query->condition('t.vocabulary', $voc1->machine_name);
     }
   }
 }
