@@ -12,17 +12,19 @@ function content_taxonomy_form_field_ui_field_edit_form_alter(&$form, &$form_sta
 
   // Add parent selector to term reference fields, except to the autocomplete
   // widget, as it ignores the parent setting.
-  if ($field['type'] == 'taxonomy_term_reference'
-      && $instance['widget']['type'] != 'taxonomy_autocomplete'
-      && $instance['widget']['type'] != 'autocomplete_deluxe_taxonomy'
-      && $instance['widget']['type'] != 'entityreference_autocomplete'
-      && $instance['widget']['type'] != 'entityreference_autocomplete_tags') {
+  $autocomplete_types = array(
+    'taxonomy_autocomplete',
+    'autocomplete_deluxe_taxonomy',
+    'entityreference_autocomplete',
+    'entityreference_autocomplete_tags',
+  );
+  if ($field['type'] == 'taxonomy_term_reference' && !in_array($instance['widget']['type'], $autocomplete_types)) {
     // Add parent form.
     foreach ($field['settings']['allowed_values'] as $delta => $tree) {
       $options[0] = '---';
       // todo this might break with huge vocs
-      $voc = taxonomy_vocabulary_machine_name_load($tree['vocabulary']);
-      foreach (taxonomy_get_tree($voc->vid) as $term) {
+      $voc = taxonomy_vocabulary_load($tree['vocabulary']);
+      foreach (taxonomy_get_tree($voc->machine_name) as $term) {
         $options[$term->tid] = str_repeat('- ', $term->depth) . $term->name;
       }
 
@@ -34,11 +36,12 @@ function content_taxonomy_form_field_ui_field_edit_form_alter(&$form, &$form_sta
       );
 
       $form['field']['settings']['allowed_values'][$delta]['depth']  = array(
-        '#type' => 'textfield',
+        '#type' => 'number',
         '#title' => t('Tree depth'),
+        '#min' => 0,
+        '#max' => 10,
         '#default_value' => isset($tree['depth']) ? $tree['depth'] : '',
         '#description' => t('Set the depth of the tree. Leave empty to load all terms.'),
-        '#element_validate' => array('_element_validate_integer_positive'),
       );
     }
   }
@@ -79,7 +82,7 @@ function content_taxonomy_field_info_alter(&$info) {
 function content_taxonomy_allowed_values($field) {
   $options = array();
   foreach ($field['settings']['allowed_values'] as $tree) {
-    if ($vocabulary = taxonomy_vocabulary_machine_name_load($tree['vocabulary'])) {
+    if ($vocabulary = taxonomy_vocabulary_load($tree['vocabulary'])) {
       $max_depth = (isset($tree['depth']) && !empty($tree['depth'])) ? $tree['depth'] : NULL;
       $terms = content_taxonomy_get_terms($field, $vocabulary, $tree['parent'], $max_depth);
       if (!empty($terms) && is_array($terms)) {
@@ -124,7 +127,7 @@ function content_taxonomy_get_terms($field, $vocabulary, $parent, $max_depth) {
   $tree_callback = 'taxonomy_get_tree';
   backdrop_alter('content_taxonomy_tree_callback', $tree_callback, $field, $vocabulary);
   if (function_exists($tree_callback)) {
-    $terms = $tree_callback($vocabulary->vid, $parent, $max_depth, FALSE);
+    $terms = $tree_callback($vocabulary->machine_name, $parent, $max_depth, FALSE);
   }
 
   return $terms;
@@ -169,7 +172,7 @@ function content_taxonomy_field_widget_form_alter(&$element, &$form_state, $cont
 function content_taxonomy_allowed_values_opt_groups($field) {
   $options = array();
   foreach ($field['settings']['allowed_values'] as $tree) {
-    if ($vocabulary = taxonomy_vocabulary_machine_name_load($tree['vocabulary'])) {
+    if ($vocabulary = taxonomy_vocabulary_load($tree['vocabulary'])) {
       $terms = content_taxonomy_get_terms($field, $vocabulary, 0, 2);
       if (!empty($terms) && is_array($terms)) {
         $current_group_term = NULL;
