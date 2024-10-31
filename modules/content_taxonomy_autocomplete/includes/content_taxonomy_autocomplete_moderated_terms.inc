@@ -71,7 +71,7 @@ class ContentTaxonomyAutocompleteModeratedTermsSearchAPIProcessor extends Search
   private function fieldValueIsModerated($value, $field) {
     $allowed_voc = $field['settings']['allowed_values'][0]['vocabulary'];
     $term = taxonomy_term_load($value);
-    if ($term && $term->vocabulary_machine_name == $allowed_voc) {
+    if ($term && $term->vocabulary == $allowed_voc) {
       return FALSE;
     }
     return TRUE;
