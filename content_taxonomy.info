@@ -3,5 +3,6 @@ name = Content Taxonomy
 description = Extends the Taxonomy Reference Fields
 backdrop = 1.x
 package = Fields
+maintainers[indigoxela] = indigoxela
 
 dependencies[] = taxonomy
