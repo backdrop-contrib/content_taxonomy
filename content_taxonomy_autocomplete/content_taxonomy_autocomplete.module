@@ -23,15 +23,6 @@ function content_taxonomy_autocomplete_field_widget_info_alter(&$info) {
     $info['autocomplete_deluxe_taxonomy']['settings'] += $ct_settings;
   }
 
-  // Add this to the entityreference autocomplete as well, if enabled.
-  if (isset($info['entityreference_autocomplete']['settings'])) {
-    $info['entityreference_autocomplete']['settings'] += $ct_settings;
-  }
-
-  // Add this to the entityreference autocomplete (tags) as well, if enabled.
-  if (isset($info['entityreference_autocomplete_tags']['settings'])) {
-    $info['entityreference_autocomplete_tags']['settings'] += $ct_settings;
-  }
 }
 
 /**
@@ -239,7 +230,5 @@ function _content_taxonomy_autocomplete_supported_types() {
     'taxonomy_autocomplete',
     'active_tags_taxonomy_autocomplete',
     'autocomplete_deluxe_taxonomy',
-    'entityreference_autocomplete',
-    'entityreference_autocomplete_tags',
   );
 }
